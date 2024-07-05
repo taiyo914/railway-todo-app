@@ -12,7 +12,6 @@ export default [
   prettierConfig,
   {
     rules: {
-      "react/react-in-jsx-scope": "off",
     },
   },
 ];
