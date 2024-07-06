@@ -87,7 +87,7 @@ export const Home = () => {
               const isActive = list.id === selectListId;
               return (
                 <li
-                  key={key}
+                  key={key} //絶対list.idにした方がよくない?! keyっていうかインデックスだよね？
                   className={`list-tab-item ${isActive ? "active" : ""}`}
                   onClick={() => handleSelectList(list.id)}
                 >
