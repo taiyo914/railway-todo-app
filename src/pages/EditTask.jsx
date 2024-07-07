@@ -17,14 +17,26 @@ export const EditTask = () => {
   const handleTitleChange = (e) => setTitle(e.target.value);
   const handleDetailChange = (e) => setDetail(e.target.value);
   const handleIsDoneChange = (e) => setIsDone(e.target.value === "done");
+
+  // ここから変更
+  const [limit, setLimit] = useState("");
+  const handleLimitChange = (e) => {
+    setLimit(e.target.value)
+    console.log(`Type: ${typeof e.target.value}, Value: ${e.target.value}`); //デバッグ用
+  };
+  // ここまで変更
+
   const onUpdateTask = () => {
     console.log(isDone);
-    const data = {
+    //ここから変更
+    let data ={
       title: title,
       detail: detail,
       done: isDone,
-    };
-
+    }
+    data = limit ? {...data, limit:limit +":00Z"}:{...data, limit:null} 
+      // limit:nullで送信しても、エラーは出ないがlimitは更新されない
+    //ここまで変更
     axios
       .put(`${url}/lists/${listId}/tasks/${taskId}`, data, {
         headers: {
@@ -64,9 +76,17 @@ export const EditTask = () => {
       })
       .then((res) => {
         const task = res.data;
+        console.log(`Bearer ${cookies.token}`)
+        console.log(task)
         setTitle(task.title);
         setDetail(task.detail);
         setIsDone(task.done);
+        if(task.limit){setLimit(task.limit.replace(/:00Z$/,''));} 
+          //もしtask.limitの値があれば、limitの状態を更新(ただし、最後の:00Zという文字列は削除)
+        //デバッグ用に情報を取得
+          // console.log(listId)
+          // console.log(taskId)
+          // console.log(`Bearer ${cookies.token}`)
       })
       .catch((err) => {
         setErrorMessage(`タスク情報の取得に失敗しました。${err}`);
@@ -89,6 +109,19 @@ export const EditTask = () => {
             value={title}
           />
           <br />
+
+          {/* ここから変更 */}
+          <label >期限</label>
+          <br/>
+          <input 
+            type="datetime-local" 
+            onChange ={handleLimitChange}
+            value ={limit}
+            className="edit-task-limit"
+          />
+          <br/>
+          {/* ここまで変更 */}
+
           <label>詳細</label>
           <br />
           <textarea

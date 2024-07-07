@@ -11,7 +11,6 @@ export default [
   pluginReactConfig,
   prettierConfig,
   {
-    rules: {
-    },
+    rules: {},
   },
 ];

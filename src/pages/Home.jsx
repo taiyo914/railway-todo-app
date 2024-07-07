@@ -41,6 +41,7 @@ export const Home = () => {
         })
         .then((res) => {
           setTasks(res.data.tasks);
+          console.log(res.data.tasks); //デバッグ用
         })
         .catch((err) => {
           setErrorMessage(`タスクの取得に失敗しました。${err}`);
@@ -122,11 +123,39 @@ export const Home = () => {
   );
 };
 
-// 表示するタスク
+// Tasksコンポーネント
 const Tasks = (props) => {
   const { tasks, selectListId, isDoneDisplay } = props;
   if (tasks === null) return <></>;
 
+// ここから変更
+  //limitの表示を整える関数
+  const formatLimitString =(limit) =>{
+    return (
+      new Date(limit).toLocaleDateString("ja-JP",{
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit',second: undefined, // 秒は表示しない
+        timeZone: 'UTC' // UTCタイムゾーンを指定
+      })
+    )
+  }
+  //残り日時を計算する関数
+  const calculateRemainingTime = (limit) => {
+    const now = new Date();
+    const deadline = new Date(limit);
+    const difference = deadline - now;
+    if (difference > 0) {
+      const minutes = Math.floor((difference / 1000 / 60) % 60);
+      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      return `${days}d ${hours}h ${minutes}m`;
+    } else {
+      return "期限切れ";
+    }
+  };
+// ここまで変更
+
+//完了の画面
   if (isDoneDisplay == "done") {
     return (
       <ul>
@@ -134,7 +163,45 @@ const Tasks = (props) => {
           .filter((task) => {
             return task.done === true;
           })
-          .map((task, key) => (
+          .map((task, key) => {
+            return(
+              <li key={key} className="task-item">
+              <Link
+                to={`/lists/${selectListId}/tasks/${task.id}`}
+                className="task-item-link"
+              >
+                {task.title}
+                <br />
+                {task.done ? "完了" : "未完了"}
+
+                {/* ここから変更 */}
+                {task.limit ? (
+                  <>
+                    <br/>
+                    期限：{formatLimitString(task.limit)}
+                    <br/>
+                    残り日時：{calculateRemainingTime(task.limit)} 
+                  </>
+                ) : ""}
+                {/* ここまで変更 */}
+
+              </Link>
+            </li>
+            )
+          })}
+      </ul>
+    );
+  }
+
+//未完了の画面
+  return (
+    <ul>
+      {tasks
+        .filter((task) => {
+          return task.done === false;
+        })
+        .map((task, key) => {
+          return(
             <li key={key} className="task-item">
               <Link
                 to={`/lists/${selectListId}/tasks/${task.id}`}
@@ -143,31 +210,22 @@ const Tasks = (props) => {
                 {task.title}
                 <br />
                 {task.done ? "完了" : "未完了"}
-              </Link>
-            </li>
-          ))}
-      </ul>
-    );
-  }
 
-  return (
-    <ul>
-      {tasks
-        .filter((task) => {
-          return task.done === false;
-        })
-        .map((task, key) => (
-          <li key={key} className="task-item">
-            <Link
-              to={`/lists/${selectListId}/tasks/${task.id}`}
-              className="task-item-link"
-            >
-              {task.title}
-              <br />
-              {task.done ? "完了" : "未完了"}
-            </Link>
+                {/* ここから変更 */}
+                {task.limit ? (
+                  <>
+                    <br/>
+                    期限：{formatLimitString(task.limit)}
+                    <br/>
+                    残り日時：{calculateRemainingTime(task.limit)} 
+                  </>
+                ) : ""}
+                {/* ここまで変更 */}
+
+              </Link>
           </li>
-        ))}
+          )
+        })}
     </ul>
   );
 };
