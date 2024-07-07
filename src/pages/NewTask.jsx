@@ -17,13 +17,23 @@ export const NewTask = () => {
   const handleTitleChange = (e) => setTitle(e.target.value);
   const handleDetailChange = (e) => setDetail(e.target.value);
   const handleSelectList = (id) => setSelectListId(id);
+
+  //新たなステートlimitと、handleLimitChangeを追加-----------
+  const [limit, setLimit] = useState("");
+  const handleLimitChange = (e) => {
+    setLimit(e.target.value + ":00Z")
+    console.log(e.target.value + ":00Z")
+  };
+  //-----------------------------------------------------
+
   const onCreateTask = () => {
-    const data = {
+    let data = {
       title: title,
       detail: detail,
       done: false,
     };
-
+    data = limit ? {...data, limit:limit +":00Z"}:data
+    console.log(data)
     axios
       .post(`${url}/lists/${selectListId}/tasks`, data, {
         headers: {
@@ -81,6 +91,16 @@ export const NewTask = () => {
             onChange={handleTitleChange}
             className="new-task-title"
           />
+          <br />
+
+          {/* ここから期限の日付を入力するinput要素を追加 */}
+          <input 
+            type="datetime-local" 
+            onChange={handleLimitChange} 
+            className ="datetime-local"
+          />
+          {/* ここまでが変更箇所 */}
+
           <br />
           <label>詳細</label>
           <br />
