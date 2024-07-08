@@ -32,7 +32,7 @@ export const NewTask = () => {
       detail: detail,
       done: false,
     };
-    data = limit ? {...data, limit:limit +":00Z"}:data
+    data = limit ? {...data, limit:limit}:data
     console.log(data)
     axios
       .post(`${url}/lists/${selectListId}/tasks`, data, {

@@ -37,6 +37,7 @@ export const EditTask = () => {
     data = limit ? {...data, limit:limit +":00Z"}:{...data, limit:null} 
       // limit:nullで送信しても、エラーは出ないがlimitは更新されない
     //ここまで変更
+    console.log(data)
     axios
       .put(`${url}/lists/${listId}/tasks/${taskId}`, data, {
         headers: {
