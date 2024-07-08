@@ -64,6 +64,16 @@ export const Home = () => {
         setErrorMessage(`タスクの取得に失敗しました。${err}`);
       });
   };
+
+  // Enterを押すとhandleSelectList関数が実行される関数を追加
+  const handleKeyDown = (event, id) => {
+    if (event.key === 'Enter') {
+      event.preventDefault(); //Chromeはなくても動くが一応つけとく
+      handleSelectList(id);
+    }
+  };
+  // ここまで
+
   return (
     <div>
       <Header />
@@ -83,20 +93,31 @@ export const Home = () => {
               </p>
             </div>
           </div>
-          <ul className="list-tab">
-            {lists.map((list, key) => {
+
+          {/* ここを編集 */}
+          <ul className="list-tab" role="tablist"> {/* roleを追加 */}
+            {lists.map((list) => {
               const isActive = list.id === selectListId;
               return (
                 <li
-                  key={key} //絶対list.idにした方がよくない?! keyっていうかインデックスだよね？
+                  key ={list.id}
                   className={`list-tab-item ${isActive ? "active" : ""}`}
                   onClick={() => handleSelectList(list.id)}
+                // ここから変更
+                  onKeyDown={(e) => handleKeyDown(e, list.id)}
+                  tabIndex={0} 
+                  // ここから下は機能上は不要だが、アクセシビリティをより高めるための記述
+                  role = "tab"
+                  aria-selected={selectListId === list.id}
+                // ここまで変更
                 >
                   {list.title}
                 </li>
               );
             })}
           </ul>
+          {/* ここを編集 */}
+
           <div className="tasks">
             <div className="tasks-header">
               <h2>タスク一覧</h2>
@@ -128,13 +149,12 @@ const Tasks = (props) => {
   const { tasks, selectListId, isDoneDisplay } = props;
   if (tasks === null) return <></>;
 
-// ここから変更
   //limitの表示を整える関数
   const formatLimitString =(limit) =>{
     return (
       new Date(limit).toLocaleDateString("ja-JP",{
         year: 'numeric', month: '2-digit', day: '2-digit',
-        hour: '2-digit', minute: '2-digit',second: undefined, // 秒は表示しない
+        hour: '2-digit', minute: '2-digit',second: undefined, 
         timeZone: 'UTC' // UTCタイムゾーンを指定
       })
     )
@@ -153,7 +173,6 @@ const Tasks = (props) => {
       return "期限切れ";
     }
   };
-// ここまで変更
 
 //完了の画面
   if (isDoneDisplay == "done") {
@@ -174,7 +193,6 @@ const Tasks = (props) => {
                 <br />
                 {task.done ? "完了" : "未完了"}
 
-                {/* ここから変更 */}
                 {task.limit ? (
                   <>
                     <br/>
@@ -183,7 +201,6 @@ const Tasks = (props) => {
                     残り日時：{calculateRemainingTime(task.limit)} 
                   </>
                 ) : ""}
-                {/* ここまで変更 */}
 
               </Link>
             </li>
@@ -211,7 +228,6 @@ const Tasks = (props) => {
                 <br />
                 {task.done ? "完了" : "未完了"}
 
-                {/* ここから変更 */}
                 {task.limit ? (
                   <>
                     <br/>
@@ -220,7 +236,6 @@ const Tasks = (props) => {
                     残り日時：{calculateRemainingTime(task.limit)} 
                   </>
                 ) : ""}
-                {/* ここまで変更 */}
 
               </Link>
           </li>
